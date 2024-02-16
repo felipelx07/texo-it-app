@@ -23,7 +23,7 @@ O comando abaixo executa a aplicação para validação da estrutura de resposta
 .\mvnw quarkus:dev
 ```
 
-URL da API para validação do JSON: http://localgost:8080/movies
+URL da API para validação do JSON: http://localhost:8080/movies
 
 ### Testes
 O comando abaixo executa os testes de integrações isolados de casos especifícos como: 
