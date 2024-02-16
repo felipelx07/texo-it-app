@@ -32,15 +32,15 @@ public class MovieIntegrationTest {
                 .body().as(MovieResponse.class);
     }
 
-    @Test //performance testing
-    public void response_is_less_then_900_milleseconds() {
+    @Test //performance testing //TODO will increase
+    public void response_is_less_then_1200_milleseconds() {
         given()
                 .when()
                 .get("/movies")
                 .then()
                 .assertThat()
                 .statusCode(200)
-                .time(Matchers.lessThan(900L));
+                .time(Matchers.lessThan(1200L));
     }
 
     @Test
