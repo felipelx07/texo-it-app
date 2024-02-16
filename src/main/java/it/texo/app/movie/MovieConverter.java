@@ -1,4 +1,4 @@
-package it.texo.app;
+package it.texo.app.movie;
 
 import jakarta.enterprise.context.Dependent;
 import java.util.ArrayList;

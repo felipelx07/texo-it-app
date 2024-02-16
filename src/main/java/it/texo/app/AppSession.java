@@ -2,6 +2,9 @@ package it.texo.app;
 
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
+import it.texo.app.movie.Movie;
+import it.texo.app.movie.MovieConverter;
+import it.texo.app.movie.MovieDto;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;

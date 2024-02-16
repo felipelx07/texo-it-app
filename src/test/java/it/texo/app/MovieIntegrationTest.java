@@ -1,6 +1,10 @@
 package it.texo.app;
 
 import io.quarkus.test.junit.QuarkusTest;
+import it.texo.app.movie.Movie;
+import it.texo.app.movie.MovieConverter;
+import it.texo.app.movie.MovieDto;
+import it.texo.app.movie.MovieResponse;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import lombok.SneakyThrows;
@@ -58,7 +62,7 @@ public class MovieIntegrationTest {
                 .then()
                 .statusCode(200)
                 .extract()
-                .body().as(MovieResponse.class).max.isEmpty();
+                .body().as(MovieResponse.class).getMax().isEmpty();
 
         Assertions.assertTrue(isNotEmpty); //assert is not empty
     }

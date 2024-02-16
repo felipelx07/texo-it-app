@@ -1,4 +1,4 @@
-package it.texo.app;
+package it.texo.app.movie;
 
 import com.opencsv.bean.CsvBindByPosition;
 import lombok.Getter;

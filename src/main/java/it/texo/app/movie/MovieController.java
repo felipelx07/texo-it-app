@@ -1,4 +1,4 @@
-package it.texo.app;
+package it.texo.app.movie;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
