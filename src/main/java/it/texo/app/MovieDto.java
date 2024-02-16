@@ -1,4 +1,4 @@
-package it.texo.app.dto;
+package it.texo.app;
 
 import com.opencsv.bean.CsvBindByPosition;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class MovieCsvDto {
+public class MovieDto {
 
     @CsvBindByPosition(position = 0)
     public String year;

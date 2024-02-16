@@ -1,4 +1,4 @@
-package it.texo.app.movie;
+package it.texo.app;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.Column;

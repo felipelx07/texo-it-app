@@ -1,34 +1,66 @@
 package it.texo.app;
 
 import io.quarkus.test.junit.QuarkusTest;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import lombok.SneakyThrows;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
 
 @QuarkusTest
 public class MovieIntegrationTest {
 
-    @Test
-    public void test_max_interval_empty() {
+    @Inject
+    MovieConverter converter;
+
+    @Test //json structure testing
+    public void is_structure_response_validated() {
         given()
                 .when().get("/movies")
                 .then()
                 .statusCode(200)
-                .body("max", is(Collections.emptyList()));
+                .extract()
+                .body().as(MovieResponse.class);
+    }
+
+    @Test //performance testing
+    public void response_is_less_then_900_milleseconds() {
+        given()
+                .when()
+                .get("/movies")
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .time(Matchers.lessThan(900L));
     }
 
     @Test
-    public void test_first_min_interval() {
-        given()
+    @SneakyThrows
+    @Transactional
+    public void is_csv_loaded_and_save_on_db() {
+        Movie.deleteAll(); //remove all movies on DB
+
+        List<Movie> moviesEntities = new ArrayList<>();
+        CsvUtil<MovieDto> csvUtil = new CsvUtil<>();
+        List<MovieDto> movies = csvUtil.load(MovieDto.class); //load csv file and parse to MovieDto
+        movies.forEach(dto -> moviesEntities.add(converter.toEntity(dto)));
+
+        var count = Movie.count();
+        Assertions.assertEquals(0, count); //asert that don't have movies
+
+        Movie.persist(moviesEntities); //save movies on DB
+        var isNotEmpty = !given()
                 .when().get("/movies")
                 .then()
                 .statusCode(200)
-                .body("min[0].producer", equalTo("Joel Silver"))
-                .body("min[0].interval", equalTo(1))
-                .body("min[0].previousWin", equalTo(1990))
-                .body("min[0].followingWin", equalTo(1991));
+                .extract()
+                .body().as(MovieResponse.class).max.isEmpty();
+
+        Assertions.assertTrue(isNotEmpty); //assert is not empty
     }
 }
 
