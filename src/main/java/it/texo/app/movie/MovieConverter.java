@@ -9,8 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Dependent
 public class MovieConverter {
@@ -26,7 +27,6 @@ public class MovieConverter {
     }
 
     public MovieResponse toResponse(List<Movie> winnerMovies) {
-        AtomicInteger MAX_INTERVAL = new AtomicInteger();
         MovieResponse movieResponse = new MovieResponse();
         List<MovieResponseData> groupAllMovieResponse = new ArrayList<>();
         Map<String, List<Movie>> moviesGroupedByProducer = groupByProducer(winnerMovies);
@@ -40,23 +40,16 @@ public class MovieConverter {
 
             if (firstWinnerMovie.isPresent() && lastWinnerMovie.isPresent()) {
                 int interval = lastWinnerMovie.get().year - firstWinnerMovie.get().year;
-
-                if (interval > MAX_INTERVAL.get())
-                    MAX_INTERVAL.set(interval);
-
                 if (interval > 0) {
                     groupAllMovieResponse.add(createMovieResponseData(producer, interval, firstWinnerMovie.get().year, lastWinnerMovie.get().year));
                 }
             }
         });
-        var sortedGroupAllMovieResponse = groupAllMovieResponse.stream().sorted(Comparator.comparing(MovieResponseData::getInterval));
-        sortedGroupAllMovieResponse.forEach(responseData -> {
-            if (responseData.interval <= (MAX_INTERVAL.get() / 2))
-                movieResponse.min.add(responseData);
-            else
-                movieResponse.max.add(responseData);
-        });
-
+        Supplier<Stream<MovieResponseData>> sortedGroupAllMovieResponse = () -> groupAllMovieResponse.stream().sorted(Comparator.comparing(MovieResponseData::getInterval));
+        Optional<MovieResponseData> firstResponseData = sortedGroupAllMovieResponse.get().findFirst();
+        Optional<MovieResponseData> lastResponseData = sortedGroupAllMovieResponse.get().skip(groupAllMovieResponse.size() - 1).findFirst();
+        firstResponseData.ifPresent(movieResponseData -> movieResponse.min.add(movieResponseData));
+        lastResponseData.ifPresent(movieResponseData -> movieResponse.max.add(movieResponseData));
         return movieResponse;
     }
 
