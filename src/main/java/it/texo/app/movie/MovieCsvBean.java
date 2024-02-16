@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class MovieDto {
+public class MovieCsvBean {
 
     @CsvBindByPosition(position = 0)
     public String year;

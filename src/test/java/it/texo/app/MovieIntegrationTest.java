@@ -3,8 +3,9 @@ package it.texo.app;
 import io.quarkus.test.junit.QuarkusTest;
 import it.texo.app.movie.Movie;
 import it.texo.app.movie.MovieConverter;
-import it.texo.app.movie.MovieDto;
+import it.texo.app.movie.MovieCsvBean;
 import it.texo.app.movie.MovieResponse;
+import it.texo.app.utils.CsvUtil;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import lombok.SneakyThrows;
@@ -49,8 +50,8 @@ public class MovieIntegrationTest {
         Movie.deleteAll(); //remove all movies on DB
 
         List<Movie> moviesEntities = new ArrayList<>();
-        CsvUtil<MovieDto> csvUtil = new CsvUtil<>();
-        List<MovieDto> movies = csvUtil.load(MovieDto.class); //load csv file and parse to MovieDto
+        CsvUtil<MovieCsvBean> csvUtil = new CsvUtil<>();
+        List<MovieCsvBean> movies = csvUtil.load(MovieCsvBean.class); //load csv file and parse to MovieDto
         movies.forEach(dto -> moviesEntities.add(converter.toEntity(dto)));
 
         var count = Movie.count();

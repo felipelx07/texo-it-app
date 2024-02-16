@@ -4,7 +4,8 @@ import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
 import it.texo.app.movie.Movie;
 import it.texo.app.movie.MovieConverter;
-import it.texo.app.movie.MovieDto;
+import it.texo.app.movie.MovieCsvBean;
+import it.texo.app.utils.CsvUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
@@ -33,8 +34,8 @@ public class AppSession {
     @Transactional(Transactional.TxType.REQUIRES_NEW)
     void processCsv() throws Exception {
         List<Movie> moviesEntities = new ArrayList<>();
-        CsvUtil<MovieDto> csvUtil = new CsvUtil<>();
-        List<MovieDto> movies = csvUtil.load(MovieDto.class);
+        CsvUtil<MovieCsvBean> csvUtil = new CsvUtil<>();
+        List<MovieCsvBean> movies = csvUtil.load(MovieCsvBean.class);
         movies.forEach(dto -> moviesEntities.add(converter.toEntity(dto)));
         Movie.persist(moviesEntities);
     }

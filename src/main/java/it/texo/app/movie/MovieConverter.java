@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @Dependent
 public class MovieConverter {
 
-    public Movie toEntity(MovieDto dto) throws NumberFormatException {
+    public Movie toEntity(MovieCsvBean dto) throws NumberFormatException {
         Movie movie = new Movie();
         movie.title = dto.title;
         movie.producers = dto.producers;

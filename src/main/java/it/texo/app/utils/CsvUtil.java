@@ -1,4 +1,4 @@
-package it.texo.app;
+package it.texo.app.utils;
 
 import com.opencsv.bean.CsvToBeanBuilder;
 import com.opencsv.enums.CSVReaderNullFieldIndicator;
