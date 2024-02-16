@@ -27,10 +27,10 @@ public class MovieIntegrationTest {
                 .when().get("/movies")
                 .then()
                 .statusCode(200)
-                .body("max[0].producer", equalTo("Matthew Vaughn"))
-                .body("max[0].interval", equalTo(13))
-                .body("max[0].previousWin", equalTo(2002))
-                .body("max[0].followingWin", equalTo(2015));
+                .body("max[1].producer", equalTo("Matthew Vaughn"))
+                .body("max[1].interval", equalTo(22))
+                .body("max[1].previousWin", equalTo(2015))
+                .body("max[1].followingWin", equalTo(2037));
     }
 
     @Test

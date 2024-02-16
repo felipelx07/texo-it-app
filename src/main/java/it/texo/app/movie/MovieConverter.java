@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -27,6 +27,8 @@ public class MovieConverter {
     }
 
     public MovieResponse toResponse(List<Movie> winnerMovies) {
+        AtomicInteger MIN_INTERVAL = new AtomicInteger(1);
+        AtomicInteger MAX_INTERVAL = new AtomicInteger();
         MovieResponse movieResponse = new MovieResponse();
         List<MovieResponseData> groupAllMovieResponse = new ArrayList<>();
         Map<String, List<Movie>> moviesGroupedByProducer = groupByProducer(winnerMovies);
@@ -35,21 +37,31 @@ public class MovieConverter {
                 return;
             }
 
-            Optional<Movie> firstWinnerMovie = movies.stream().findFirst();
-            Optional<Movie> lastWinnerMovie = movies.stream().skip(movies.size() - 1).findFirst();
+            Movie lastWinnerMovie = null;
+            for (Movie movie : movies) {
+                int interval = lastWinnerMovie == null ? 0 : movie.year - lastWinnerMovie.year;
 
-            if (firstWinnerMovie.isPresent() && lastWinnerMovie.isPresent()) {
-                int interval = lastWinnerMovie.get().year - firstWinnerMovie.get().year;
                 if (interval > 0) {
-                    groupAllMovieResponse.add(createMovieResponseData(producer, interval, firstWinnerMovie.get().year, lastWinnerMovie.get().year));
+                    if (interval > MAX_INTERVAL.get())
+                        MAX_INTERVAL.set(interval);
+
+                    groupAllMovieResponse.add(createMovieResponseData(producer, interval, lastWinnerMovie.year, movie.year));
                 }
+
+                lastWinnerMovie = movie;
             }
         });
-        Supplier<Stream<MovieResponseData>> sortedGroupAllMovieResponse = () -> groupAllMovieResponse.stream().sorted(Comparator.comparing(MovieResponseData::getInterval));
-        Optional<MovieResponseData> firstResponseData = sortedGroupAllMovieResponse.get().findFirst();
-        Optional<MovieResponseData> lastResponseData = sortedGroupAllMovieResponse.get().skip(groupAllMovieResponse.size() - 1).findFirst();
-        firstResponseData.ifPresent(movieResponseData -> movieResponse.min.add(movieResponseData));
-        lastResponseData.ifPresent(movieResponseData -> movieResponse.max.add(movieResponseData));
+        var sortedGroupAllMovieResponse = groupAllMovieResponse.stream().sorted(Comparator.comparing(MovieResponseData::getInterval));
+        sortedGroupAllMovieResponse.forEach(responseData -> {
+            if (responseData.interval <= MIN_INTERVAL.get())
+                movieResponse.min.add(responseData);
+            else if (responseData.interval == MAX_INTERVAL.get())
+                movieResponse.max.add(responseData);
+        });
+
+        movieResponse.min.sort(Comparator.comparing(MovieResponseData::getPreviousWin));
+        movieResponse.max.sort(Comparator.comparing(MovieResponseData::getPreviousWin));
+
         return movieResponse;
     }
 
